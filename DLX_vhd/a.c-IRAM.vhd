@@ -22,18 +22,16 @@ end IRAM;
 
 architecture IRam_Bhe of IRAM is
 
-  type RAMtype is array (0 to RAM_DEPTH - 1) of integer;-- std_logic_vector(I_SIZE - 1 downto 0);
-
+  type RAMtype is array (0 to RAM_DEPTH - 1) of integer;
+  -- This memory is implemented as a 32-bit word array to simplify simulation, despite the DLX being byte-addressable.
   signal IRAM_mem : RAMtype;
 
 begin  -- IRam_Bhe
 
-  Dout <= conv_std_logic_vector(IRAM_mem(conv_integer(unsigned(Addr))),I_SIZE);
+    -- We drop the two least significant bits of the address (divide by 4) to map the byte-addressable PC to the 32 bit word-aligned index addr(I_SIZE-1 downto 2)
+  Dout <= conv_std_logic_vector(IRAM_mem(conv_integer(unsigned(Addr))),I_SIZE-1 downto 2);
 
-  -- purpose: This process is in charge of filling the Instruction RAM with the firmware
-  -- type   : combinational
-  -- inputs : Rst
-  -- outputs: IRAM_mem
+
   FILL_MEM_P: process (Rst)
     file mem_fp: text;
     variable file_line : line;

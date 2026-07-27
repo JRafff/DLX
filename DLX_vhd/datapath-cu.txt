@@ -1,0 +1,207 @@
+==============================================================================
+  DLX-basic  --  NOTE PER LA STESURA DEL DATAPATH (compatibile con Cu_v2)
+==============================================================================
+
+Queste note fissano i vincoli che il datapath deve rispettare per essere
+coerente con la CU hardwired appena scritta (a.a-CU_HW.vhd) e con le scelte
+di design fatte per Cu_v2:
+
+  - CW_SIZE = 15 (immutata)
+  - EQ_COND riusato come "branch enable" generico (BEQZ e BNEZ)
+  - JAL: trucco via ALU (MUXA=NPC, MUXB=IMM=0) per portare NPC in R31
+  - PC_LATCH_EN sempre alto (il PC avanza ogni ciclo)
+
+
+==============================================================================
+ 1. INTERFACCIA CU -> DATAPATH
+==============================================================================
+
+Segnali che la CU produce (in ordine di stadio) e cosa il datapath deve
+farne. La CW e' gia' shiftata attraverso i CW_PIPE, quindi ogni segnale
+arriva al datapath nel ciclo giusto:
+
+  Stadio IF (cw1)
+    IR_LATCH_EN      1 -> catturare IRAM_DOut nel registro IR
+    NPC_LATCH_EN     1 -> catturare PC+4 nel registro NPC
+
+  Stadio ID (cw2)
+    RegA_LATCH_EN    1 -> catturare RF[RS1] nel registro A
+    RegB_LATCH_EN    1 -> catturare RF[RS2] nel registro B
+                          (per SW: usare RD come indirizzo, vedi punto 4)
+    RegIMM_LATCH_EN  1 -> catturare l'immediato esteso nel registro IMM
+
+  Stadio EX (cw3)
+    MUXA_SEL         0 -> ingresso A dell'ALU = RegA
+                     1 -> ingresso A dell'ALU = NPC
+    MUXB_SEL         0 -> ingresso B dell'ALU = RegB
+                     1 -> ingresso B dell'ALU = IMM
+    ALU_OPCODE       operazione ALU (aluOp: ADDS/SUBS/ANDS/ORS/XORS/
+                     LLS/LRS/SGES/SLES/SNES/NOP)
+    ALU_OUTREG_EN    1 -> catturare ALU_result nel registro ALU_OUT
+    EQ_COND          1 -> istruzione di branch condizionale (BEQZ o BNEZ)
+
+  Stadio MEM (cw4)
+    DRAM_WE          1 -> scrittura in DRAM (solo SW)
+    LMD_LATCH_EN     1 -> catturare DRAM_DOut nel registro LMD (solo LW)
+    JUMP_EN          1 -> istruzione di salto (J/JAL/BEQZ/BNEZ):
+                          se incondizionata OPPURE se la condizione di
+                          branch e' verificata -> PC = target
+    PC_LATCH_EN      sempre 1 -> il registro PC si aggiorna ogni ciclo
+
+  Stadio WB (cw5)
+    WB_MUX_SEL       0 -> valore scritto in RF = ALU_OUT
+                     1 -> valore scritto in RF = LMD (solo LW)
+    RF_WE            1 -> scrivi nel Register File
+
+
+==============================================================================
+ 2. SEMANTICHE SPECIALI (coupling CU <-> DP)
+==============================================================================
+
+Alcune scelte di codifica risparmiano bit nella CW ma richiedono che il
+datapath legga l'opcode dell'IR per prendere decisioni. E' fondamentale:
+
+ 2.1  BNEZ (opcode 0x05) ha la STESSA CW di BEQZ (opcode 0x04).
+      -> Il datapath deve decodificare l'opcode e NEGARE la condizione
+         "RegA == 0" quando opcode = 0x05.
+      -> La condizione effettiva di branch e' quindi:
+           branch_taken =
+             (opcode = 0x04) AND (RegA  = 0)   -- BEQZ
+             OR
+             (opcode = 0x05) AND (RegA /= 0)   -- BNEZ
+      -> Il PC input mux fa: se (JUMP_EN=1 AND (uncond OR branch_taken))
+         allora PC <- ALU_OUT; altrimenti PC <- PC+4.
+         J e JAL sono incondizionati (EQ_COND=0, JUMP_EN=1).
+
+ 2.2  JAL (opcode 0x03) usa il trucco ALU:
+        MUXA=1 (NPC), MUXB=1 (IMM)
+        WB_MUX_SEL=0 (ALU_OUT), RF_WE=1
+      Perche' funzioni:
+       a) Nel percorso IMM il datapath deve forzare IMM=0 quando
+          opcode = 0x03 (altrimenti in R31 va NPC+IMM26).
+          -> Aggiungere un mux o un AND sull'uscita dell'IMM extender:
+             imm_to_muxB = (opcode = 0x03) ? 0 : imm_extended
+       b) La ALU calcolera' NPC+0 = NPC -> ALU_OUT = NPC.
+       c) Il TARGET del salto (NPC + IMM26) non puo' essere calcolato
+          dalla ALU (gia' occupata a produrre NPC). Serve quindi un
+          SOMMATORE DEDICATO al target di salto:
+             jump_target = NPC + sign_extend(imm26)
+          Questo sommatore alimenta il PC mux quando JUMP_EN=1.
+       d) La destinazione di JAL e' R31, non il campo RD dell'IR.
+          -> Il mux di scelta del "write register" del RF deve avere:
+               R-type  : RD = IR[15..11]
+               I-type  : RD = IR[20..16]
+               JAL     : R31 (forzato)
+             seleziona in base a opcode.
+
+ 2.3  SW (opcode 0x2B) usa il RD come sorgente dati.
+      Formato I-type: [OP | RS1 | RD | IMM16]
+      Per SW il valore da scrivere in memoria sta in RF[RD].
+      -> Il mux della porta di lettura RS2 del RF deve avere:
+               R-type  : IR[20..16]  (RS2 vero)
+               SW      : IR[20..16]  <- questo E' gia' il campo RD in
+                                        I-type, quindi coincide
+             In pratica per SW e' sufficiente leggere sempre IR[20..16]
+             sulla porta B. RegB_LATCH_EN vale 1 sia per R-type che per SW.
+
+ 2.4  PC_LATCH_EN sempre alto.
+      Il PC si aggiorna ogni ciclo. L'ingresso al registro PC e':
+           PC_in = (JUMP_EN AND (uncond OR branch_taken)) ? jump_target
+                                                          : PC + 4
+      Nota: mentre completi il datapath ma non hai ancora la logica
+      di jump/branch, puoi tenere temporaneamente PC_in = PC+4.
+
+
+==============================================================================
+ 3. BLOCCHI DEL DATAPATH (fig. 2.1 del dlx_guide)
+==============================================================================
+
+Da progettare o riutilizzare dai lab precedenti:
+
+  - Register File
+        32 registri x 32 bit; R0 sempre 0 (scritture ignorate).
+        3 porte: RS1 (read), RS2 (read), RD (write).
+        Enable di scrittura = RF_WE, sincrono su fronte di clock.
+
+  - ALU
+        Operazioni richieste dal subset basic:
+          ADDS, SUBS       (add/addi/sub/subi/lw/sw/j/jal/beqz/bnez)
+          ANDS, ORS, XORS  (and/andi/or/ori/xor/xori)
+          LLS, LRS         (sll/slli/srl/srli)
+          SGES, SLES, SNES (sge/sgei/sle/slei/sne/snei)
+          NOP              (uscita don't-care)
+        Set-comparison: uscita = 1 se condizione vera, 0 altrimenti.
+
+  - Sign / Zero Extender per l'immediato
+        I-type imm16 -> 32 bit
+          - sign-extend per: addi, subi, slei, sgei, snei, lw, sw,
+                             beqz, bnez, slli, srli
+          - zero-extend  per: andi, ori, xori
+        J-type imm26 -> 32 bit (sign-extend) per J e JAL
+        -> Serve un mux "extend_mode" pilotato dall'opcode.
+
+  - Comparator "reg == 0" (zero detector su RegA) per BEQZ/BNEZ.
+
+  - Sommatore dedicato per target salti: jump_target = NPC + IMM_esteso.
+
+  - Sommatore PC+4 (in stadio IF).
+
+  - Data RAM (byte-addressable, big-endian, allineata a word per lw/sw).
+
+  - Pipeline registers:
+        IF/ID   : IR, NPC
+        ID/EX   : RegA, RegB, IMM, opcode (per BNEZ/JAL/SW),
+                  RD_field, RS_field (se serve per il forwarding pro)
+        EX/MEM  : ALU_OUT, RegB (per SW), destination register,
+                  branch_taken flag, jump_target
+        MEM/WB  : ALU_OUT, LMD, destination register
+
+  - Muxes:
+        MUXA        : RegA | NPC                 (controllo: MUXA_SEL)
+        MUXB        : RegB | IMM_esteso          (controllo: MUXB_SEL)
+        WB_MUX      : ALU_OUT | LMD              (controllo: WB_MUX_SEL)
+        PC_MUX      : PC+4 | jump_target         (controllo: JUMP_EN
+                                                  AND (uncond OR branch_taken))
+        REG_DST_MUX : RD(R-type) | RD(I-type) | R31(JAL)  (da opcode)
+        IMM_JAL_MUX : IMM_esteso | 0             (0 se opcode = 0x03)
+        EXT_MUX     : sign | zero                (da opcode, per andi/ori/xori)
+
+
+==============================================================================
+ 4. TOP-LEVEL a-DLX.vhd -- COSA CAMBIARE
+==============================================================================
+
+Nel file a-DLX.vhd oggi c'e' (riga 127 circa):
+    PC_BUS <= (others => '0');
+
+Va rimosso quando il datapath e' pronto e sostituito col vero
+"PC_in" descritto sopra. Prima di quel momento il PC resta a 0 e
+qualsiasi test end-to-end esegue solo la prima istruzione.
+
+Aggiungere l'instanziazione del datapath (component nuovo, es. dlx_dp)
+con tutte le porte di controllo collegate ai segnali *_i gia' presenti
+(IR_LATCH_EN_i, RegA_LATCH_EN_i, ...) e la Data RAM.
+
+
+==============================================================================
+ 5. NOTE PRATICHE / TRAPPOLE
+==============================================================================
+
+  - I registri di stage sono in numero fissato (fig. 2.5 della guida).
+    NON aggiungere latch nascosti nei blocchi combinatori.
+  - R0 non deve MAI cambiare: intercetta la scrittura al RF quando
+    destination = 0.
+  - Per gli shift (sll/srl e le varianti "-i") lo shift amount arriva:
+        R-type  -> dal registro RS2  (fai attenzione: alcuni datapath
+                    prendono i 5 bit meno significativi)
+        I-type  -> dal campo IMM (usa i 5 LSB dopo l'estensione)
+  - Big-endian: se implementi anche lb/lh in futuro, ricordati il byte
+    swap. Per lw/sw non serve, ma valida l'allineamento a 4 byte.
+  - I test in test_bench/TB_DLX.vhd (top-level) hanno senso solo dopo
+    che il PC avanza davvero e la Data RAM e' collegata: intanto per
+    validare la CU usa test_bench/TB_CU_HW.vhd + sim_cu.do.
+  - Quando aggiungerai l'ALU vera, verifica che ALU_OPCODE_i arrivi
+    in EX allineato con RegA/RegB/IMM: il pipeline register aluOpcode3
+    e' gia' quello giusto (vedi a.a-CU_HW.vhd righe 158-165).
+
+==============================================================================

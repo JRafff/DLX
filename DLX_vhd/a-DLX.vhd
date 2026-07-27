@@ -22,10 +22,7 @@ end DLX;
 --
 architecture dlx_rtl of DLX is
 
- --------------------------------------------------------------------
  -- Components Declaration
- --------------------------------------------------------------------
-  
   --Instruction Ram
   component IRAM
 --     generic (
@@ -37,7 +34,18 @@ architecture dlx_rtl of DLX is
       Dout : out std_logic_vector(IR_SIZE - 1 downto 0));
   end component;
 
-  -- Data Ram (MISSING!You must include it in your final project!)
+  -- Data Ram 
+  component DRAM
+   port (
+    Clk  : in  std_logic; 
+    Rst  : in  std_logic; 
+    RM   : in  std_logic; -- Read Memory enable
+    WM   : in  std_logic; -- Write Memory enable
+    Addr : in  std_logic_vector(D_SIZE - 1 downto 0);
+    Din  : in  std_logic_vector(D_SIZE - 1 downto 0);
+    Dout : out std_logic_vector(D_SIZE - 1 downto 0)
+  );
+  end component;
 
   -- Datapath (MISSING!You must include it in your final project!)
   
@@ -187,7 +195,16 @@ architecture dlx_rtl of DLX is
           Rst  => Rst,
           Addr => PC,
           Dout => IRam_DOut);
-
+    DRAM_I: DRAM
+      port map (
+          Clk  => Clk,
+          Rst  => Rst,
+          RM   => null,-- esiste?
+          WM   => DRAM_WE_i
+          Addr => null,--alu out
+          Din  => null,-- me
+          Dout => null,--mux
+    );
     
     
 end dlx_rtl;
