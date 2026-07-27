@@ -19,7 +19,7 @@ begin
     
     logic_proc: process(A, B, logic_sel)
     begin
-        case logic_sel 
+        case logic_sel is
             when "00" => logic_out <= A and B;
             when "01" => logic_out <= A or B;
             when "10" => logic_out <= A xor B;

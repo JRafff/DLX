@@ -88,20 +88,20 @@ end component;
         A        => A,
         B        => B,
         S        => out_adder,
-        cout     => open,      -- Il sintetizzatore lo taglierà via!
+        cout     => open,      -- Il sintetizzatore lo taglierÃ  via!
         N        => flag_N,
         Z        => flag_Z,
         V        => flag_V
         );
-        LOGIC: logic 
+        LOGICs: logic 
         generic map (
             Nbit => 32
         )
         port map (
             A    => A,
             B    => B,
-            sel  => ctrl_logic, -- Guidato dal MUX dell'Opcode
-            Y    => out_logic   -- Esce e va al MUX
+            logic_sel  => ctrl_logic, -- Guidato dal MUX dell'Opcode
+            logic_out    => out_logic   -- Esce e va al MUX
         );
 
         COMPARE_EQ: comparator_eq 
@@ -113,7 +113,7 @@ end component;
             B      => B,
             eq_out => out_compare_neq -- Esce e va al MUX
         );
-        SHIFTER: shifter 
+        SHIFTERs: shifter 
         generic map (
             Nbit => 32
         )
@@ -125,7 +125,7 @@ end component;
         );
 
 
-        alu_proc: process(ALU_OPCODE, out_adder, out_logic, out_shifter, out_compare_eq, flag_N, flag_V, flag_Z)
+        alu_proc: process(ALU_OPCODE, out_adder, out_logic, out_shifter, out_compare_neq, flag_N, flag_V, flag_Z)
         begin
             ctrl_add_sub    <= '0'; 
             ctrl_logic      <= "00";
@@ -184,8 +184,6 @@ end component;
                     ALU_OUT <= (others => '0');
                 
                 
-
-
             end case;
         end process alu_proc;
 

@@ -6,7 +6,7 @@ use ieee.math_real.all;
 entity koggle_stone_adder is 
 generic (
     N : integer := 32;
-    lev : integer := integer(ceil(log2(real(N))))
+    lev : integer := 5   -- log2(32) = 5
 );
 port (
     A : in std_logic_vector(N-1 downto 0);
@@ -18,7 +18,6 @@ port (
 end entity;
 
 architecture str of koggle_stone_adder is
-
     type matrix_array is array(0 to lev) of std_logic_vector(N-1 downto 0);
     signal P_net, G_net : matrix_array;
 
@@ -71,7 +70,7 @@ begin
 
             place_block: if j >= step generate
     
-                g_block: if (j - step) = 0 generate
+                gblock: if (j - step) = 0 generate
                     G: G_block 
                     port map (
                         Pik => P_net(i)(j),
@@ -80,9 +79,9 @@ begin
                         Gij => G_net(i+1)(j)
                     );
                     P_net(i+1)(j) <= '0';
-                end generate g_block;
+                end generate gblock;
     
-                pg_block: if (j - step) > 0 generate
+                pgblock: if (j - step) > 0 generate
                     PG: PG_block
                     port map (
                         Pik => P_net(i)(j),
@@ -92,7 +91,7 @@ begin
                         Pij => P_net(i+1)(j),
                         Gij => G_net(i+1)(j)
                     );
-                end generate pg_block;
+                end generate pgblock;
     
             end generate place_block;
 
