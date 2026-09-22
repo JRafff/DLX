@@ -1,0 +1,157 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1790 1010" width="1790" height="1010" font-family="ui-sans-serif,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif">
+<rect width="1790" height="1010" fill="#ffffff"/>
+<defs><marker id="a-data" viewBox="0 0 9 9" refX="8" refY="4.5" markerWidth="6.5" markerHeight="6.5" orient="auto"><path d="M0,0 L9,4.5 L0,9 z" fill="#1e3a5f"/></marker><marker id="a-ctrl" viewBox="0 0 9 9" refX="8" refY="4.5" markerWidth="6.5" markerHeight="6.5" orient="auto"><path d="M0,0 L9,4.5 L0,9 z" fill="#2563eb"/></marker><marker id="a-fwd" viewBox="0 0 9 9" refX="8" refY="4.5" markerWidth="6.5" markerHeight="6.5" orient="auto"><path d="M0,0 L9,4.5 L0,9 z" fill="#d97706"/></marker><marker id="a-bnd" viewBox="0 0 9 9" refX="8" refY="4.5" markerWidth="6.5" markerHeight="6.5" orient="auto"><path d="M0,0 L9,4.5 L0,9 z" fill="#dc2626"/></marker><marker id="a-ok" viewBox="0 0 9 9" refX="8" refY="4.5" markerWidth="6.5" markerHeight="6.5" orient="auto"><path d="M0,0 L9,4.5 L0,9 z" fill="#059669"/></marker></defs>
+<text x="26" y="40" font-size="21" fill="#1f2937" text-anchor="start" font-weight="600" >DLX-pro &#8212; 5-stage pipelined datapath</text>
+<text x="26" y="62" font-size="13" fill="#6b7280" text-anchor="start" font-weight="400" >Harvard organisation, hardwired Control Unit with an internal control-word pipeline (cw → cw1 → cw2 → cw3).</text>
+<text x="26" y="79" font-size="13" fill="#6b7280" text-anchor="start" font-weight="400" >Branches and jumps are resolved in DECODE, so a mispredict costs a single flushed instruction.</text>
+<text x="26" y="96" font-size="12" fill="#9ca3af" text-anchor="start" font-weight="400" font-family="ui-monospace,SFMono-Regular,Menlo,Consolas,monospace" >src/core/a-DLX.vhd</text>
+<rect x="30" y="174" width="392" height="532" rx="10" fill="#f8fafc" stroke="#e5e7eb" stroke-width="1.2"/>
+<text x="226.0" y="194" font-size="13" fill="#6b7280" text-anchor="middle" font-weight="700" letter-spacing="1.4">FETCH</text>
+<rect x="452" y="174" width="402" height="532" rx="10" fill="#f8fafc" stroke="#e5e7eb" stroke-width="1.2"/>
+<text x="653.0" y="194" font-size="13" fill="#6b7280" text-anchor="middle" font-weight="700" letter-spacing="1.4">DECODE</text>
+<rect x="914" y="174" width="292" height="532" rx="10" fill="#f8fafc" stroke="#e5e7eb" stroke-width="1.2"/>
+<text x="1060.0" y="194" font-size="13" fill="#6b7280" text-anchor="middle" font-weight="700" letter-spacing="1.4">EXECUTE</text>
+<rect x="1246" y="174" width="232" height="532" rx="10" fill="#f8fafc" stroke="#e5e7eb" stroke-width="1.2"/>
+<text x="1362.0" y="194" font-size="13" fill="#6b7280" text-anchor="middle" font-weight="700" letter-spacing="1.4">MEMORY</text>
+<rect x="1518" y="174" width="242" height="532" rx="10" fill="#f8fafc" stroke="#e5e7eb" stroke-width="1.2"/>
+<text x="1639.0" y="194" font-size="13" fill="#6b7280" text-anchor="middle" font-weight="700" letter-spacing="1.4">WRITE BACK</text>
+<path d="M72,286 L102,298 L102,402 L72,414 Z" fill="#f1f5f9" stroke="#475569" stroke-width="1.5"/>
+<text x="87.0" y="354.0" font-size="10.5" fill="#6b7280" text-anchor="middle" font-weight="600" >4:1</text>
+<text x="87" y="278" font-size="10.5" fill="#6b7280" text-anchor="middle" font-weight="600" >PC_sel</text>
+<rect x="148" y="326" width="62" height="52" rx="6" fill="#fee2e2" stroke="#dc2626" stroke-width="1.6"/>
+<text x="179.0" y="356.5" font-size="14" fill="#1f2937" text-anchor="middle" font-weight="600" >PC</text>
+<rect x="148" y="226" width="62" height="46" rx="6" fill="#ecfdf5" stroke="#047857" stroke-width="1.6"/>
+<text x="179.0" y="253.5" font-size="13" fill="#1f2937" text-anchor="middle" font-weight="600" >+4</text>
+<rect x="240" y="222" width="164" height="96" rx="6" fill="#fef3c7" stroke="#b45309" stroke-width="1.6"/>
+<text x="322.0" y="267.0" font-size="13" fill="#1f2937" text-anchor="middle" font-weight="600" >I-cache</text>
+<text x="322.0" y="283.0" font-size="10.5" fill="#6b7280" text-anchor="middle" font-weight="400" >4-way set assoc.</text>
+<text x="322.0" y="295.0" font-size="10.5" fill="#6b7280" text-anchor="middle" font-weight="400" >16 words · pseudo-LRU</text>
+<rect x="240" y="356" width="164" height="78" rx="6" fill="#fef3c7" stroke="#b45309" stroke-width="1.6"/>
+<text x="322.0" y="392.0" font-size="13" fill="#1f2937" text-anchor="middle" font-weight="600" >IRAM</text>
+<text x="322.0" y="408.0" font-size="10.5" fill="#6b7280" text-anchor="middle" font-weight="400" >sync, 3-cycle handshake</text>
+<rect x="62" y="472" width="210" height="84" rx="6" fill="#ecfdf5" stroke="#047857" stroke-width="1.6"/>
+<text x="167.0" y="511.0" font-size="13" fill="#1f2937" text-anchor="middle" font-weight="600" >BTB + BHT</text>
+<text x="167.0" y="527.0" font-size="10.5" fill="#6b7280" text-anchor="middle" font-weight="400" >64 entries · tag + target</text>
+<text x="167.0" y="539.0" font-size="10.5" fill="#6b7280" text-anchor="middle" font-weight="400" >2-bit saturating counter</text>
+<path d="M102,352 L148,352" fill="none" stroke="#1e3a5f" stroke-width="1.6" stroke-linecap="round" marker-end="url(#a-data)"/>
+<circle cx="179" cy="352" r="3.2" fill="#1e3a5f"/>
+<path d="M179,326 L179,272" fill="none" stroke="#1e3a5f" stroke-width="1.6" stroke-linecap="round" marker-end="url(#a-data)"/>
+<path d="M210,352 L217,352 Q224,352 224,345 L224,277 Q224,270 231,270 L240,270" fill="none" stroke="#1e3a5f" stroke-width="1.6" stroke-linecap="round" marker-end="url(#a-data)"/>
+<circle cx="224" cy="352" r="3.2" fill="#1e3a5f"/>
+<path d="M224,352 L224,507 Q224,514 217,514 L62,514" fill="none" stroke="#1e3a5f" stroke-width="1.6" stroke-linecap="round" marker-end="url(#a-data)"/>
+<path d="M322,318 L322,356" fill="none" stroke="#1e3a5f" stroke-width="1.6" stroke-linecap="round" marker-end="url(#a-data)"/>
+<text x="329" y="342" font-size="9.5" fill="#b45309" text-anchor="start" font-weight="400" >miss → fill</text>
+<path d="M148,249 L131,249 Q124,249 124,256 L124,300" fill="none" stroke="#1e3a5f" stroke-width="1.6" stroke-linecap="round" marker-end="url(#a-data)"/>
+<text x="144" y="241" font-size="10" fill="#6b7280" text-anchor="end" font-weight="400" >PC+4</text>
+<path d="M272,500 L293,500 Q300,500 300,507 L300,577 Q300,584 293,584 L53,584 Q46,584 46,577 L46,407 Q46,400 53,400 L72,400" fill="none" stroke="#d97706" stroke-width="1.6" stroke-linecap="round" marker-end="url(#a-fwd)"/>
+<text x="306" y="496" font-size="10" fill="#d97706" text-anchor="start" font-weight="400" >predicted target</text>
+<text x="60" y="578" font-size="10.5" fill="#d97706" text-anchor="start" font-weight="600" >taken</text>
+<text x="322" y="214" font-size="10.5" fill="#6b7280" text-anchor="middle" font-weight="600" >IR</text>
+<rect x="486" y="288" width="176" height="124" rx="6" fill="#eef2ff" stroke="#4338ca" stroke-width="1.6"/>
+<text x="574.0" y="347.0" font-size="13" fill="#1f2937" text-anchor="middle" font-weight="600" >Register File</text>
+<text x="574.0" y="363.0" font-size="10.5" fill="#6b7280" text-anchor="middle" font-weight="400" >32 x 32 bit</text>
+<text x="574.0" y="375.0" font-size="10.5" fill="#6b7280" text-anchor="middle" font-weight="400" >2R / 1W · write-through</text>
+<rect x="486" y="452" width="176" height="66" rx="6" fill="#eef2ff" stroke="#4338ca" stroke-width="1.6"/>
+<text x="574.0" y="482.0" font-size="13" fill="#1f2937" text-anchor="middle" font-weight="600" >ImmGen</text>
+<text x="574.0" y="498.0" font-size="10.5" fill="#6b7280" text-anchor="middle" font-weight="400" >sign / zero extend</text>
+<rect x="712" y="452" width="150" height="66" rx="6" fill="#ecfdf5" stroke="#047857" stroke-width="1.6"/>
+<text x="787.0" y="482.0" font-size="13" fill="#1f2937" text-anchor="middle" font-weight="600" >Kogge-Stone</text>
+<text x="787.0" y="498.0" font-size="10.5" fill="#6b7280" text-anchor="middle" font-weight="400" >NPC + imm = target</text>
+<rect x="712" y="208" width="150" height="52" rx="6" fill="#ecfdf5" stroke="#047857" stroke-width="1.6"/>
+<text x="787.0" y="238.5" font-size="13" fill="#1f2937" text-anchor="middle" font-weight="600" >zero_check</text>
+<rect x="712" y="292" width="150" height="76" rx="6" fill="#ecfdf5" stroke="#047857" stroke-width="1.6"/>
+<text x="787.0" y="327.0" font-size="13" fill="#1f2937" text-anchor="middle" font-weight="600" >branch_resolution</text>
+<text x="787.0" y="343.0" font-size="10.5" fill="#6b7280" text-anchor="middle" font-weight="400" >mispredict =</text>
+<text x="787.0" y="355.0" font-size="10.5" fill="#6b7280" text-anchor="middle" font-weight="400" >taken XOR actual</text>
+<path d="M668,206 L694,218 L694,254 L668,266 Z" fill="#f1f5f9" stroke="#475569" stroke-width="1.5"/>
+<text x="660" y="232" font-size="9.5" fill="#d97706" text-anchor="end" font-weight="600" >fwd</text>
+<path d="M404,270 L459,270 Q466,270 466,277 L466,315 Q466,322 473,322 L486,322" fill="none" stroke="#1e3a5f" stroke-width="1.6" stroke-linecap="round" marker-end="url(#a-data)"/>
+<circle cx="466" cy="322" r="3.2" fill="#1e3a5f"/>
+<path d="M466,322 L466,478 Q466,485 473,485 L486,485" fill="none" stroke="#1e3a5f" stroke-width="1.6" stroke-linecap="round" marker-end="url(#a-data)"/>
+<path d="M662,318 L687,318 Q694,318 694,311 L694,266" fill="none" stroke="#1e3a5f" stroke-width="1.6" stroke-linecap="round" marker-end="url(#a-data)"/>
+<path d="M694,234 L712,234" fill="none" stroke="#1e3a5f" stroke-width="1.6" stroke-linecap="round" marker-end="url(#a-data)"/>
+<path d="M787,260 L787,292" fill="none" stroke="#1e3a5f" stroke-width="1.6" stroke-linecap="round" marker-end="url(#a-data)"/>
+<path d="M662,485 L712,485" fill="none" stroke="#1e3a5f" stroke-width="1.6" stroke-linecap="round" marker-end="url(#a-data)"/>
+<text x="576" y="434" font-size="9.5" fill="#9ca3af" text-anchor="middle" font-weight="400" >IR fields</text>
+<path d="M944,266 L972,278 L972,338 L944,350 Z" fill="#f1f5f9" stroke="#475569" stroke-width="1.5"/>
+<text x="958.0" y="312.0" font-size="10.5" fill="#6b7280" text-anchor="middle" font-weight="600" >A</text>
+<path d="M944,382 L972,394 L972,454 L944,466 Z" fill="#f1f5f9" stroke="#475569" stroke-width="1.5"/>
+<text x="958.0" y="428.0" font-size="10.5" fill="#6b7280" text-anchor="middle" font-weight="600" >B</text>
+<path d="M1018,256 L1182,318 L1182,414 L1018,476 L1018,384 L1044,366 L1018,348 Z" fill="#ecfdf5" stroke="#047857" stroke-width="1.8"/>
+<text x="1108" y="352" font-size="17" fill="#1f2937" text-anchor="middle" font-weight="700" >ALU</text>
+<text x="1108" y="374" font-size="10.5" fill="#6b7280" text-anchor="middle" font-weight="400" >add/sub · logic</text>
+<text x="1108" y="388" font-size="10.5" fill="#6b7280" text-anchor="middle" font-weight="400" >shift · set-compare</text>
+<path d="M972,308 L1018,308" fill="none" stroke="#1e3a5f" stroke-width="1.6" stroke-linecap="round" marker-end="url(#a-data)"/>
+<path d="M972,424 L993,424 Q1000,424 1000,417 L1000,407 Q1000,400 1007,400 L1018,400" fill="none" stroke="#1e3a5f" stroke-width="1.6" stroke-linecap="round" marker-end="url(#a-data)"/>
+<rect x="1272" y="288" width="178" height="126" rx="6" fill="#fef3c7" stroke="#b45309" stroke-width="1.6"/>
+<text x="1361.0" y="348.0" font-size="13" fill="#1f2937" text-anchor="middle" font-weight="600" >DRAM</text>
+<text x="1361.0" y="364.0" font-size="10.5" fill="#6b7280" text-anchor="middle" font-weight="400" >128 x 32 bit</text>
+<text x="1361.0" y="376.0" font-size="10.5" fill="#6b7280" text-anchor="middle" font-weight="400" >sync write / async read</text>
+<path d="M1182,344 L1272,344" fill="none" stroke="#1e3a5f" stroke-width="1.6" stroke-linecap="round" marker-end="url(#a-data)"/>
+<text x="1204" y="336" font-size="10" fill="#6b7280" text-anchor="start" font-weight="400" >addr</text>
+<path d="M1566,306 L1596,318 L1596,390 L1566,402 Z" fill="#f1f5f9" stroke="#475569" stroke-width="1.5"/>
+<text x="1581.0" y="358.0" font-size="10.5" fill="#6b7280" text-anchor="middle" font-weight="600" >WB</text>
+<path d="M1450,344 L1566,344" fill="none" stroke="#1e3a5f" stroke-width="1.6" stroke-linecap="round" marker-end="url(#a-data)"/>
+<text x="1474" y="336" font-size="10" fill="#6b7280" text-anchor="start" font-weight="400" >LMD</text>
+<path d="M1498,286 L1533,286 Q1540,286 1540,293 L1540,321 Q1540,328 1547,328 L1566,328" fill="none" stroke="#1e3a5f" stroke-width="1.6" stroke-linecap="round" marker-end="url(#a-data)"/>
+<text x="1526" y="278" font-size="10" fill="#6b7280" text-anchor="start" font-weight="400" >ALU_OUT</text>
+<path d="M1596,354 L1668,354" fill="none" stroke="#1e3a5f" stroke-width="1.6" stroke-linecap="round" marker-end="url(#a-data)"/>
+<text x="1632" y="344" font-size="10.5" fill="#1f2937" text-anchor="middle" font-weight="600" >wb_data</text>
+<line x1="432" y1="172" x2="432" y2="708" stroke="#dc2626" stroke-width="2" stroke-dasharray="7 5" opacity="0.85"/>
+<text x="432" y="164" font-size="11.5" fill="#dc2626" text-anchor="middle" font-weight="700" >IF/ID</text>
+<line x1="894" y1="172" x2="894" y2="708" stroke="#dc2626" stroke-width="2" stroke-dasharray="7 5" opacity="0.85"/>
+<text x="894" y="164" font-size="11.5" fill="#dc2626" text-anchor="middle" font-weight="700" >ID/EX</text>
+<line x1="1226" y1="172" x2="1226" y2="708" stroke="#dc2626" stroke-width="2" stroke-dasharray="7 5" opacity="0.85"/>
+<text x="1226" y="164" font-size="11.5" fill="#dc2626" text-anchor="middle" font-weight="700" >EX/MEM</text>
+<line x1="1498" y1="172" x2="1498" y2="708" stroke="#dc2626" stroke-width="2" stroke-dasharray="7 5" opacity="0.85"/>
+<text x="1498" y="164" font-size="11.5" fill="#dc2626" text-anchor="middle" font-weight="700" >MEM/WB</text>
+<circle cx="1204" cy="344" r="3.2" fill="#d97706"/>
+<path d="M1204,344 L1204,599 Q1204,606 1197,606 L937,606 Q930,606 930,599 L930,291 Q930,284 937,284 L944,284" fill="none" stroke="#d97706" stroke-width="1.9" stroke-linecap="round" marker-end="url(#a-fwd)"/>
+<text x="1064" y="599" font-size="10" fill="#d97706" text-anchor="middle" font-weight="400" >EX/MEM.alu_out → EX</text>
+<circle cx="1668" cy="354" r="3.2" fill="#d97706"/>
+<path d="M1668,354 L1668,623 Q1668,630 1661,630 L925,630 Q918,630 918,623 L918,407 Q918,400 925,400 L944,400" fill="none" stroke="#d97706" stroke-width="1.9" stroke-linecap="round" marker-end="url(#a-fwd)"/>
+<text x="1290" y="623" font-size="10" fill="#d97706" text-anchor="middle" font-weight="400" >wb_data (MEM/WB) → EX</text>
+<path d="M1204,606 L1204,647 Q1204,654 1197,654 L688,654 Q681,654 681,647 L681,266" fill="none" stroke="#d97706" stroke-width="1.7" stroke-linecap="round" marker-end="url(#a-fwd)" stroke-dasharray="6 4"/>
+<text x="950" y="647" font-size="10" fill="#d97706" text-anchor="middle" font-weight="400" >EX/MEM.alu_out → ID (branch operand)</text>
+<path d="M1668,630 L1668,673 Q1668,680 1661,680 L475,680 Q468,680 468,673 L468,387 Q468,380 475,380 L486,380" fill="none" stroke="#d97706" stroke-width="1.9" stroke-linecap="round" marker-end="url(#a-fwd)"/>
+<text x="1080" y="673" font-size="10" fill="#d97706" text-anchor="middle" font-weight="400" >wb_data → Register File write port</text>
+<path d="M862,330 L879,330 Q886,330 886,323 L886,147 Q886,140 879,140 L53,140 Q46,140 46,147 L46,333 Q46,340 53,340 L72,340" fill="none" stroke="#dc2626" stroke-width="2" stroke-linecap="round" marker-end="url(#a-bnd)"/>
+<text x="466" y="132" font-size="11.5" fill="#dc2626" text-anchor="middle" font-weight="600" >mispredict · recovery address · BTB update   (ID → IF)</text>
+<rect x="30" y="742" width="1730" height="136" rx="10" fill="#f8fafc" stroke="#e5e7eb" stroke-width="1.2"/>
+<text x="46" y="763" font-size="12.5" fill="#6b7280" text-anchor="start" font-weight="700" letter-spacing="1.4">CONTROL</text>
+<rect x="60" y="778" width="306" height="84" rx="6" fill="#dbeafe" stroke="#2563eb" stroke-width="1.6"/>
+<text x="213.0" y="817.0" font-size="13" fill="#1f2937" text-anchor="middle" font-weight="600" >Control Unit (hardwired)</text>
+<text x="213.0" y="833.0" font-size="10.5" fill="#6b7280" text-anchor="middle" font-weight="400" >64-entry control-word ROM</text>
+<text x="213.0" y="845.0" font-size="10.5" fill="#6b7280" text-anchor="middle" font-weight="400" >cw → cw1 → cw2 → cw3  ·  stall / flush arbiter</text>
+<rect x="400" y="778" width="254" height="84" rx="6" fill="#dbeafe" stroke="#2563eb" stroke-width="1.6"/>
+<text x="527.0" y="817.0" font-size="13" fill="#1f2937" text-anchor="middle" font-weight="600" >hazard_detector</text>
+<text x="527.0" y="833.0" font-size="10.5" fill="#6b7280" text-anchor="middle" font-weight="400" >load_use_alarm</text>
+<text x="527.0" y="845.0" font-size="10.5" fill="#6b7280" text-anchor="middle" font-weight="400" >branch_stall_alarm</text>
+<rect x="688" y="778" width="254" height="84" rx="6" fill="#dbeafe" stroke="#2563eb" stroke-width="1.6"/>
+<text x="815.0" y="817.0" font-size="13" fill="#1f2937" text-anchor="middle" font-weight="600" >forwarding_unit (EX)</text>
+<text x="815.0" y="833.0" font-size="10.5" fill="#6b7280" text-anchor="middle" font-weight="400" >FORWARD_A / FORWARD_B</text>
+<text x="815.0" y="845.0" font-size="10.5" fill="#6b7280" text-anchor="middle" font-weight="400" >EX/MEM has priority over MEM/WB</text>
+<rect x="976" y="778" width="254" height="84" rx="6" fill="#dbeafe" stroke="#2563eb" stroke-width="1.6"/>
+<text x="1103.0" y="817.0" font-size="13" fill="#1f2937" text-anchor="middle" font-weight="600" >forwarding_id (ID)</text>
+<text x="1103.0" y="833.0" font-size="10.5" fill="#6b7280" text-anchor="middle" font-weight="400" >FWD_ID_A for the operand</text>
+<text x="1103.0" y="845.0" font-size="10.5" fill="#6b7280" text-anchor="middle" font-weight="400" >feeding zero_check</text>
+<rect x="1266" y="772" width="480" height="77" rx="7" fill="#eff6ff" stroke="#2563eb" stroke-width="1.3"/>
+<text x="1278" y="791" font-size="12" fill="#1f2937" text-anchor="start" font-weight="700" >Control signals issued every cycle</text>
+<text x="1278" y="809" font-size="11.5" fill="#6b7280" text-anchor="start" font-weight="400" >PC_EN · IF_ID_EN/CLEAR · ID_EX_EN/CLEAR</text>
+<text x="1278" y="824" font-size="11.5" fill="#6b7280" text-anchor="start" font-weight="400" >EX_MEM_EN/CLEAR · MEM_WB_EN/CLEAR</text>
+<text x="1278" y="839" font-size="11.5" fill="#6b7280" text-anchor="start" font-weight="400" >MUXA_SEL · MUXB_SEL · ALU_OPCODE · DRAM_WE · WB_MUX_SEL · RF_WE</text>
+<path d="M213,778 L213,716" fill="none" stroke="#2563eb" stroke-width="1.5" stroke-linecap="round" marker-end="url(#a-ctrl)"/>
+<path d="M527,778 L527,716" fill="none" stroke="#2563eb" stroke-width="1.5" stroke-linecap="round" marker-end="url(#a-ctrl)"/>
+<path d="M815,778 L815,716" fill="none" stroke="#2563eb" stroke-width="1.5" stroke-linecap="round" marker-end="url(#a-ctrl)"/>
+<path d="M1103,778 L1103,716" fill="none" stroke="#2563eb" stroke-width="1.5" stroke-linecap="round" marker-end="url(#a-ctrl)"/>
+<line x1="40" y1="914" x2="62" y2="914" stroke="#1e3a5f" stroke-width="2.4"/>
+<text x="69" y="918" font-size="11.5" fill="#6b7280" text-anchor="start" font-weight="400" >datapath (32-bit unless noted)</text>
+<line x1="440" y1="914" x2="462" y2="914" stroke="#2563eb" stroke-width="2.4"/>
+<text x="469" y="918" font-size="11.5" fill="#6b7280" text-anchor="start" font-weight="400" >control signal from the CU</text>
+<line x1="840" y1="914" x2="862" y2="914" stroke="#d97706" stroke-width="2.4"/>
+<text x="869" y="918" font-size="11.5" fill="#6b7280" text-anchor="start" font-weight="400" >forwarding / feedback path</text>
+<line x1="1240" y1="914" x2="1262" y2="914" stroke="#dc2626" stroke-width="2.4" stroke-dasharray="7 5"/>
+<text x="1269" y="918" font-size="11.5" fill="#6b7280" text-anchor="start" font-weight="400" >pipeline boundary · branch recovery</text>
+<text x="40" y="960" font-size="11.5" fill="#6b7280" text-anchor="start" font-weight="400" >Resolving branches in DECODE instead of EXECUTE is what makes the 1-cycle mispredict penalty possible: the wrong-path instruction is still in IF/ID and is simply cleared.</text>
+<text x="40" y="978" font-size="11.5" fill="#6b7280" text-anchor="start" font-weight="400" >The price is a new hazard class — a branch whose operand is still in flight — absorbed by branch_stall_alarm plus the dedicated ID forwarding path.</text>
+</svg>

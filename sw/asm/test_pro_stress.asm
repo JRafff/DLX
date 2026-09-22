@@ -1,7 +1,7 @@
 ; =============================================================================
 ;  test_pro_stress.asm  --  DLX-PRO feature stress test
 ; -----------------------------------------------------------------------------
-;  Author : Daniele Palermo
+;  Author : Raffaele Negri  (github.com/JRafff)
 ;  Date   : 2026-09-15
 ;
 ;  Purpose:
@@ -16,7 +16,7 @@
 ;       * PLRU 4-way I-cache -> later loop iterations all hit (no IRAM latency)
 ;       * IF/ID flush on mispredict (j, jal, beqz taken on the first pass)
 ;
-;  ISA actually decoded by the CU (see 05-dlx_cu.vhd):
+;  ISA actually decoded by the CU (see src/core/a.a-CU.vhd):
 ;     R-type : add, sub, and, or, xor, sll, srl, sne, sle, sge
 ;     I-type : addi, subi, andi, ori, xori, slli, srli, snei, slei, sgei
 ;     Mem    : lw, sw
@@ -43,12 +43,12 @@
 ;     - DRAM: M[0]=30, M[4]=100, M[8]=r31
 ;     - The PC ends parked in the "end_prog: j end_prog" halt-like loop.
 ;
-;  How to build and run:
-;     cd Files
-;     ./assembler.sh asm_example/test_pro_stress.asm
-;     cp asm_example/test_pro_stress.asm.mem ../DLX_project/PRO/DLX_vhd/test.asm.mem
-;     (raise the wait in TB_DLX.vhd to ~600 ns to give IRAM +
-;      backward loop + hazards enough time)
+;  How to build and run (from the repository root):
+;     sw/tools/assemble.sh sw/asm/test_pro_stress.asm
+;     cp sw/asm/test_pro_stress.mem sim/test.asm.mem
+;     cd sim && ./run_ghdl.sh            # or, in ModelSim:  do sim_dlx.do
+;
+;     The default run length (SIM_CYCLES = 400) already covers this program.
 ; =============================================================================
 
 
@@ -186,21 +186,24 @@ end_prog:
 
 
 ; =============================================================================
-;  Theoretical cycle-count breakdown (see README.md, Section 5.2)
+;  Measured cycle-count breakdown  (GHDL run, counted on the waveform)
+;  See README.md, section "Measured performance".
 ; -----------------------------------------------------------------------------
-;    Ideal execution (45 instr + 4 pipeline fill)       :  49 cycles
-;    Load-use stalls  (2 in Section 4)                  :  +2
-;    Branch stall     (1 in Section 5)                  :  +1
-;    First-pass mispredicts (j, jal, beqz, bnez loop)   :  +4
-;    I-cache first-fetch misses (~12 lines x 3 cy)      :  +36
+;    Instructions executed                              :   50
+;    Total cycles (reset release -> halt)               :  294
+;    of which stalled on I-cache misses                 :  229   (78 %)
+;    Load-use stall events                              :    2
+;    Branch stall events                                :    5
+;    Pipeline flushes (IF_ID_CLEAR)                     :    7
 ;    ------------------------------------------------------------
-;    Total                                              :  ~92 cycles
-;    Wall time @ 100 MHz clock                          :  ~920 ns
-;    CPI                                                :  ~2.04
+;    Raw CPI                                            :  5.88
+;    CPI excluding cache-miss stalls                    :  ~1.30
 ;
-;  With a warmed-up I-cache the effective CPI drops to ~1.24, showing
-;  that forwarding + BTB actually pay off. On a hypothetical BASIC-style
-;  execution (no forwarding, 3 NOPs per RAW) the same functional payload
-;  would cost ~120 cycles, so the PRO delivers a ~2x speed-up on the
-;  same 45 architected instructions.
+;  The two numbers say different things. ~1.30 is what the pipeline itself
+;  delivers: forwarding absorbs every RAW dependency in the back-to-back
+;  chains at zero cost, and the BTB turns 3 of the 4 loop iterations into
+;  zero-penalty taken branches. 5.88 is what the memory system costs: with
+;  1-word cache lines there is no spatial locality, so every instruction
+;  misses the first time it is fetched, at ~5 cycles each. The cache only
+;  pays for itself inside the loop, where iterations 2-4 hit.
 ; =============================================================================

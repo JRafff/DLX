@@ -1,0 +1,17 @@
+# Shell scripts and the Perl assembler must keep LF endings, otherwise a
+# checkout on Windows (core.autocrlf=true) gives them a CRLF shebang and
+# "./run_ghdl.sh" fails with "bad interpreter".
+*.sh            text eol=lf
+*.pl            text eol=lf
+sw/tools/conv2memory text eol=lf
+
+# ModelSim reads the .do script fine either way, but keep it stable.
+*.do            text eol=lf
+
+# Memory images are consumed by VHDL textio; LF keeps hread() happy on
+# every platform.
+*.mem           text eol=lf
+
+# Binary assets
+*.png           binary
+*.pdf           binary

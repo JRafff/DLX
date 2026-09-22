@@ -1,0 +1,48 @@
+# --- OS ---
+.DS_Store
+Thumbs.db
+
+# --- editors / IDEs ---
+.project
+.settings/
+.vscode/
+.idea/
+.library_mapping.xml
+
+# --- ModelSim / QuestaSim ---
+work/
+transcript
+*.wlf
+*.mti
+vsim.wlf
+modelsim.ini
+
+# --- GHDL ---
+sim/build/
+*.cf
+*.o
+*.ghw
+*.vcd
+tb_dlx
+tb_dlx.exe
+
+# --- Synthesis ---
+*.log
+*.svf
+work_syn/
+report/
+
+# --- assembler output (regenerate with sw/tools/assemble.sh) ---
+*.bin
+*.bin.hdr
+*.list
+*_dump.txt
+
+# ...except the listings shipped with the example programs, which are kept
+# as reference output.
+!sw/asm/**/*.list
+!sw/asm/**/*_dump.txt
+
+# The memory image the IRAM loads is checked in on purpose: it is the
+# default workload of the testbench.
+!sim/test.asm.mem
